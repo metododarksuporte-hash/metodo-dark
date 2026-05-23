@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login / Registro</title>
+
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(to right, #f0f0f0, #d9d9d9);
+    }
+
+    .container {
+      background: white;
+      width: 350px;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    h1 { margin-bottom: 20px; }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .tab-link {
+      padding: 10px 20px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-weight: bold;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab-link.active {
+      border-bottom: 2px solid #007BFF;
+      color: #007BFF;
+    }
+
+    .input-box {
+      position: relative;
+      margin: 15px 0;
+    }
+
+    .input-box input {
+      width: 100%;
+      padding: 12px 45px 12px 15px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+    }
+
+    .input-box i {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+    }
+
+    .botao-entrar {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: black;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .botao-entrar:hover {
+      background: #007BFF;
+    }
+
+    .msg {
+      height: 20px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+<main class="container">
+
+  <div class="tabs">
+    <button class="tab-link active" onclick="openTab(event,'login')">Login</button>
+    <button class="tab-link" onclick="openTab(event,'register')">Registro</button>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="login" class="tab-content">
+
+    <h1>Login</h1>
+    <div id="msg-login" class="msg"></div>
+
+    <div class="input-box">
+      <input type="email" id="login-email" placeholder="Email">
+      <i class='bx bxs-user'></i>
+    </div>
+
+    <div class="input-box">
+      <input type="password" id="login-senha" placeholder="Senha">
+      <i class='bx bxs-lock-alt'></i>
+    </div>
+
+    <button class="botao-entrar" onclick="login()">Entrar</button>
+  </div>
+
+  <!-- REGISTRO -->
+  <div id="register" class="tab-content" style="display:none;">
+
+    <h1>Registro</h1>
+    <div id="msg-register" class="msg"></div>
+
+    <div class="input-box">
+      <input type="email" id="register-email" placeholder="Email">
+      <i class='bx bxs-user'></i>
+    </div>
+
+    <div class="input-box">
+      <input type="password" id="register-senha" placeholder="Senha">
+      <i class='bx bxs-lock-alt'></i>
+    </div>
+
+    <button class="botao-entrar" onclick="register()">Criar conta</button>
+  </div>
+
+</main>
+
+<!-- 🔥 SUPABASE -->
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabaseUrl = "https://gabazmudzbonwyironwp.supabase.co/rest/v1/";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdhYmF6bXVkemJvbnd5aXJvbndwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjExMDgsImV4cCI6MjA5NTEzNzEwOH0.21J9vDgDHTWOcThbI_ybvOeK1SzQI-jZ2XVP1Ws0H_o";
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// LOGIN
+window.login = async function () {
+  const email = document.getElementById("login-email").value;
+  const senha = document.getElementById("login-senha").value;
+  const msg = document.getElementById("msg-login");
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password: senha
+  });
+
+  if (error) {
+    msg.innerText = "Erro no login";
+    msg.style.color = "red";
+    return;
+  }
+
+  msg.innerText = "Logado com sucesso!";
+  msg.style.color = "green";
+
+  setTimeout(() => {
+    window.location.href = "dashboard.html";
+  }, 800);
+};
+
+// REGISTRO
+window.register = async function () {
+  const email = document.getElementById("register-email").value;
+  const senha = document.getElementById("register-senha").value;
+  const msg = document.getElementById("msg-register");
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password: senha
+  });
+
+  if (error) {
+    msg.innerText = "Erro ao criar conta";
+    msg.style.color = "red";
+    return;
+  }
+
+  msg.innerText = "Conta criada!";
+  msg.style.color = "green";
+};
+
+// ABAS
+window.openTab = function (event, tab) {
+  document.querySelectorAll(".tab-content").forEach(e => e.style.display = "none");
+  document.querySelectorAll(".tab-link").forEach(e => e.classList.remove("active"));
+
+  document.getElementById(tab).style.display = "block";
+  event.currentTarget.classList.add("active");
+};
+
+</script>
+
+</body>
+</html>

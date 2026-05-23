@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+</head>
+
+<body>
+
+<h1>Área privada 🔥</h1>
+<p id="status">Carregando...</p>
+
+<button onclick="logout()">Sair</button>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabaseUrl = "https://gabazmudzbonwyironwp.supabase.co/rest/v1/";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdhYmF6bXVkemJvbnd5aXJvbndwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjExMDgsImV4cCI6MjA5NTEzNzEwOH0.21J9vDgDHTWOcThbI_ybvOeK1SzQI-jZ2XVP1Ws0H_o";
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// 🔒 CHECK LOGIN (CORRIGIDO)
+async function checkUser() {
+  const { data, error } = await supabase.auth.getUser();
+
+  if (error || !data.user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  document.getElementById("status").innerText =
+    "Logado como: " + data.user.email;
+}
+
+checkUser();
+
+// LOGOUT
+window.logout = async function () {
+  await supabase.auth.signOut();
+  window.location.href = "index.html";
+};
+</script>
+
+</body>
+</html>
