@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>EbookStore</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<header>
+
+<div class="nav-container">
+
+<h1 class="logo">
+EbookStore
+</h1>
+
+<div class="nav-buttons">
+
+<button
+class="nav-btn login-btn"
+id="btnEntrar"
+>
+Entrar
+</button>
+
+</div>
+
+</div>
+
+</header>
+
+<!-- HERO -->
+
+<section class="hero">
+
+<div class="hero-content">
+
+<div class="hero-left">
+
+<h1>
+Venda seus E-books como um profissional
+</h1>
+
+<p>
+Plataforma moderna inspirada na Kiwify para vender produtos digitais com checkout premium e catálogo profissional.
+</p>
+
+<div class="hero-buttons">
+
+<button class="primary-btn">
+Ver Catálogo
+</button>
+
+</div>
+
+</div>
+
+<div class="hero-card">
+
+<img
+src="100926.png"
+>
+
+<h3>
+Instagram Sem Mostrar o Rosto
+</h3>
+
+<p>
+Aprenda a crescer no Instagram usando perfis dark e estratégias virais.
+</p>
+
+<div class="hero-price">
+R$ 29,90
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- CATÁLOGO -->
+
+<section class="catalog-section">
+
+<div class="catalog-container">
+
+<div class="catalog-header">
+
+<h2>
+Catálogo Premium
+</h2>
+
+<p>
+Escolha o e-book ideal para você.
+</p>
+
+</div>
+
+<div
+id="catalogo"
+class="catalog-grid"
+>
+
+<!-- CARD -->
+
+<div class="ebook-card">
+
+<img
+src="100926.png"
+>
+
+<div class="card-content">
+
+<div class="badge">
+Mais Vendido
+</div>
+
+<h3>
+Instagram Sem Mostrar o Rosto
+</h3>
+
+<p>
+Aprenda como criar perfis dark, viralizar conteúdos e ganhar dinheiro no Instagram sem aparecer.
+</p>
+
+<div class="card-footer">
+
+<div class="price">
+R$ 29,90
+</div>
+
+<button
+class="buy-btn"
+onclick="abrirCheckout('Instagram Sem Mostrar o Rosto','29,90')"
+>
+Comprar
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- LOGIN / REGISTRO -->
+
+<div
+id="authModal"
+class="checkout-modal"
+>
+
+<div class="checkout-box">
+
+<div
+class="close-btn"
+onclick="fecharAuth()"
+>
+×
+</div>
+
+<h2 id="authTitulo">
+Login
+</h2>
+
+<input
+type="email"
+placeholder="Seu e-mail"
+id="authEmail"
+>
+
+<input
+type="password"
+placeholder="Sua senha"
+id="authSenha"
+>
+
+<button
+class="pix-btn"
+onclick="login()"
+id="authBotao"
+>
+Entrar
+</button>
+
+<p
+id="trocarAuth"
+style="
+margin-top:20px;
+text-align:center;
+color:#6b7280;
+cursor:pointer;
+font-weight:600;
+"
+onclick="trocarModo()"
+>
+Não possui conta? Criar conta
+</p>
+
+</div>
+
+</div>
+
+<!-- CHECKOUT -->
+
+<div
+id="checkoutModal"
+class="checkout-modal"
+>
+
+<div class="checkout-box">
+
+<div
+class="close-btn"
+onclick="fecharCheckout()"
+>
+×
+</div>
+
+<h2>
+Checkout
+</h2>
+
+<div class="checkout-product">
+
+<h3 id="produtoNome">
+Produto
+</h3>
+
+<p id="produtoPreco">
+R$ 00,00
+</p>
+
+</div>
+
+<input
+type="text"
+placeholder="Seu nome"
+id="checkoutNome"
+>
+
+<input
+type="email"
+placeholder="Seu e-mail"
+id="checkoutEmail"
+>
+
+<button
+class="pix-btn"
+onclick="simularPagamento()"
+>
+Pagar com PIX
+</button>
+
+</div>
+
+</div>
+
+<!-- SCRIPT -->
+
+<script>
+
+/* =========================
+   SUPABASE
+========================= */
+
+const SUPABASE_URL =
+'https://glazbcywbuayppggyvvd.supabase.co/rest/v1/'
+
+const SUPABASE_KEY =
+'sb_publishable_HdJyV4ENGXTXgDq0DxBZww_K32OCB04'
+
+const supabaseClient =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+)
+
+/* =========================
+   BOTÃO LOGIN
+========================= */
+
+const btnEntrar =
+document.getElementById('btnEntrar')
+
+const authModal =
+document.getElementById('authModal')
+
+btnEntrar.addEventListener('click', () => {
+
+authModal.style.display = 'flex'
+
+})
+
+/* =========================
+   FECHAR LOGIN
+========================= */
+
+function fecharAuth(){
+
+authModal.style.display = 'none'
+
+}
+
+/* =========================
+   TROCAR LOGIN/REGISTRO
+========================= */
+
+let modoLogin = true
+
+function trocarModo(){
+
+modoLogin = !modoLogin
+
+if(modoLogin){
+
+document.getElementById('authTitulo').innerText = 'Login'
+
+document.getElementById('authBotao').innerText = 'Entrar'
+
+document.getElementById('trocarAuth').innerText =
+'Não possui conta? Criar conta'
+
+}else{
+
+document.getElementById('authTitulo').innerText = 'Criar Conta'
+
+document.getElementById('authBotao').innerText = 'Registrar'
+
+document.getElementById('trocarAuth').innerText =
+'Já possui conta? Fazer login'
+
+}
+
+}
+
+/* =========================
+   LOGIN / REGISTRO
+========================= */
+
+async function login(){
+
+let email =
+document.getElementById('authEmail').value
+
+let senha =
+document.getElementById('authSenha').value
+
+if(email == '' || senha == ''){
+
+alert('Preencha todos os campos.')
+
+return
+
+}
+
+/* LOGIN */
+
+if(modoLogin){
+
+const { error } =
+await supabaseClient.auth.signInWithPassword({
+
+email: email,
+password: senha
+
+})
+
+if(error){
+
+alert(error.message)
+
+return
+
+}
+
+alert('Login realizado com sucesso!')
+
+}
+
+/* REGISTRO */
+
+else{
+
+const { error } =
+await supabaseClient.auth.signUp({
+
+email: email,
+password: senha
+
+})
+
+if(error){
+
+alert(error.message)
+
+return
+
+}
+
+alert('Conta criada com sucesso!')
+
+}
+
+fecharAuth()
+
+verificarUsuario()
+
+}
+
+/* =========================
+   CHECKOUT
+========================= */
+
+function abrirCheckout(nome, preco){
+
+document.getElementById('checkoutModal').style.display = 'flex'
+
+document.getElementById('produtoNome').innerText = nome
+
+document.getElementById('produtoPreco').innerText = 'R$ ' + preco
+
+}
+
+function fecharCheckout(){
+
+document.getElementById('checkoutModal').style.display = 'none'
+
+}
+
+/* =========================
+   PAGAMENTO
+========================= */
+
+async function simularPagamento(){
+
+const user =
+await supabaseClient.auth.getUser()
+
+if(!user.data.user){
+
+alert('Faça login primeiro.')
+
+return
+
+}
+
+let nome =
+document.getElementById('checkoutNome').value
+
+let email =
+document.getElementById('checkoutEmail').value
+
+if(nome == '' || email == ''){
+
+alert('Preencha todos os campos.')
+
+return
+
+}
+
+/* SALVAR COMPRA */
+
+const { error } =
+await supabaseClient
+.from('compras')
+.insert([
+
+{
+nome: nome,
+email: email,
+produto:
+document.getElementById('produtoNome').innerText,
+preco:
+document.getElementById('produtoPreco').innerText
+}
+
+])
+
+if(error){
+
+alert(error.message)
+
+return
+
+}
+
+alert('Compra registrada com sucesso!')
+
+fecharCheckout()
+
+}
+
+/* =========================
+   VERIFICAR LOGIN
+========================= */
+
+async function verificarUsuario(){
+
+const { data } =
+await supabaseClient.auth.getUser()
+
+if(data.user){
+
+btnEntrar.innerText =
+data.user.email
+
+}
+
+}
+
+verificarUsuario()
+
+</script>
+
+</body>
+
+</html>
